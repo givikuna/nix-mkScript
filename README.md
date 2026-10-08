@@ -4,7 +4,7 @@ A Nix flake utility that creates runnable shell commands from your project scrip
 
 It will create a nix package with `writeShellScriptBin`.
 
-It ensures your scripts always execute relative to the **root of your Git repository**, so you can run them from any subdirectory without breaking relative paths.
+It ensures your scripts always execute relative to root of your Git repository, so you can run them from any subdirectory without breaking relative paths.
 
 ## Supported Languages
 
