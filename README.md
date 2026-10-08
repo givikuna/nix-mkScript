@@ -14,7 +14,7 @@ Out of the box: `.sh`, `.py`, `.js`, `.ts` (via deno), `.nu`, `.elv`, `.rb`, `.p
 
 In your project's `flake.nix`:
 
-```nix
+```Nix
 {
     inputs = {
         nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -38,7 +38,7 @@ In your project's `flake.nix`:
 }
 ```
 
-## Overriding Interpreters
+## Overriding and Adding Interpreters
 
 You can override default interpreters or add new ones by passing `customInterpreters`:
 
@@ -90,5 +90,45 @@ An example of using `nix-mkScript` with `flake-parts`:
                     };
                 };
     };
+}
+```
+
+## Shebang Parsing
+
+For scripts without an extension, `mkScript` will read the shebang to know what it does.
+
+Because Nix requires pure evaluation you must in `src = ./.;` to give permissions to read files during eval.
+
+```Nix
+let
+    mkScript = mk-script.lib.mkScript pkgs {
+        src = ./.;
+    };
+in
+pkgs.mkShell {
+    buildInputs = [
+        (mkScript "deploy" "scripts/deploy")
+    ];
+}
+```
+
+## Env Variable Injection
+
+You can hardcode specific environment variables into the scripts.
+
+```Nix
+let
+    mkScript = mk-script.lib.mkScript pkgs {
+        env = {
+            DEBUG = "1";
+            DATABASE_URL = "postgres://localhost:5432/dev";
+            GREETING = "wazzup";
+        };
+    };
+in
+pkgs.mkShell {
+    buildInputs = [
+        (mkScript "start" "scripts/start.js")
+    ];
 }
 ```
