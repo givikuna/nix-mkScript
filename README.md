@@ -8,7 +8,7 @@ It ensures your scripts always execute relative to root of your Git repository, 
 
 ## Supported Languages
 
-Out of the box: `.sh`, `.py`, `.js`, `.ts` (via deno), `.nu`, `.elv`, `.rb`, `.pl`, `.lua`, `.php`, `.awk`.
+Out of the box: `.sh`, `.py`, `.js`, `.ts` (via deno), `.nu`, `.elv`, `rkt`, `.rb`, `.pl`, `.lua`, `.php`, `.awk`.
 
 ## Basic Usage
 
