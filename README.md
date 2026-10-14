@@ -132,3 +132,26 @@ pkgs.mkShell {
     ];
 }
 ```
+
+## Execute from Non-Root
+
+By default `mkScript` resolves scripts dynamically against the root of your current git repo at runtime.
+
+But sometimes, this isn't ideal.
+Say if you're doing a global installation, or whatever else.
+
+You can disable the root execution by passing in a flag:
+
+```Nix
+let
+    mkScript = mk-script.lib.mkScript pkgs {
+        executeFromRoot = false;
+        src = ./.;
+    };
+in
+pkgs.mkShell {
+    buildInputs = [
+        (mkScript "deploy" "scripts/deploy")
+    ];
+}
+```

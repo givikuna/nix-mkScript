@@ -9,6 +9,7 @@
           customInterpreters ? { },
           env ? { },
           src ? null,
+          executeFromRoot ? true,
         }:
         command-name: file-path:
         let
@@ -24,6 +25,7 @@
             "nu" = "${pkgs.nushell}/bin/nu";
             "rb" = "${pkgs.ruby}/bin/ruby";
             "pl" = "${pkgs.perl}/bin/perl";
+            "rkt" = "${pkgs.racket}/bin/racket";
           };
 
           interpreters = defaultInterpreters // customInterpreters;
@@ -50,7 +52,7 @@
               else if builtins.match ".*nu.*" shebang != null then
                 "${pkgs.nushell}/bin/nu"
               else
-                throw "mkScript: unsupported shebang '${shebang}' in${file-path}. add a customInterpreter or standard extension. be a good bloke."
+                throw "mkScript: unsupported shebang '${shebang}' in ${file-path}. add a customInterpreter or standard extension. be a good bloke."
             else
               throw "mkScript: no extension found for ${file-path}. to enable shebang parsing, pass 'src = ./.;' in the mkScript config.";
 
@@ -58,14 +60,28 @@
             pkgs.lib.mapAttrsToList (k: v: "export ${k}=${pkgs.lib.escapeShellArg (toString v)}") env
           );
 
+          targetResolution =
+            if executeFromRoot then
+              ''
+                ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+                TARGET="$ROOT_DIR/${file-path}"
+              ''
+            else if src != null then
+              ''
+                TARGET="${src}/${file-path}"
+              ''
+            else
+              ''
+                TARGET="${file-path}"
+              '';
+
         in
         pkgs.writeShellApplication {
           name = command-name;
           text = ''
             ${envLines}
 
-            ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
-            TARGET="$ROOT_DIR/${file-path}"
+            ${targetResolution}
 
             if [ ! -f "$TARGET" ]; then
               echo "error: mkScript cannot find $TARGET" >&2
